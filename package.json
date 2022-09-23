@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "engines": {
-    "node": "14.0.0"
+    "node": "^14.0.0"
   },
   "dependencies": {
     "chrome-aws-lambda": "^10.1.0",
