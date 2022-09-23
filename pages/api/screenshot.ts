@@ -8,17 +8,27 @@ export default async function handler(
   res: NextApiResponse<Buffer>
 ) {
   const { code } = req.body;
-  const options = {
-    args: chrome.args,
-    executablePath: await chrome.executablePath,
-    headless: chrome.headless,
-  };
-
+  const options = process.env.AWS_REGION
+    ? {
+        args: chrome.args,
+        executablePath: await chrome.executablePath,
+        headless: chrome.headless,
+      }
+    : {
+        args: [],
+        executablePath:
+          process.platform === "win32"
+            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            : process.platform === "linux"
+            ? "/usr/bin/google-chrome"
+            : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      };
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
   await page.setContent(code);
   const binary: Buffer = await page.screenshot({
     encoding: "binary",
   });
+  browser.close();
   res.status(200).send(binary);
 }
